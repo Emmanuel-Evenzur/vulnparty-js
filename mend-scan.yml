@@ -1,0 +1,73 @@
+# Name of your GitHub Actions Workflow for a JavaScript project
+name: Mend Security Scan (JavaScript)
+
+# Triggers for the workflow
+on:
+  # Run on pushes to the main branch
+  push:
+    branches: [ main ]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  mend-scan-js:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    steps:
+      # --- ÉTAPE 1: PRÉPARATION ET INSTALLATION DES DÉPENDANCES ---
+
+      # Step 1: Checks-out your repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Sets up a Node.js environment (replaces setup-java)
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # You can change this to your project's Node.js version
+          cache: 'npm' # Optional: Caches dependencies to speed up subsequent builds
+
+      # Step 3: Installs JavaScript dependencies (replaces mvn command)
+      # This is the most important step for the SCA scan to work correctly.
+      - name: Install Dependencies
+        run: npm install # Or use 'yarn install' if your project uses Yarn
+
+      # Step 4: Downloads the Mend CLI (this step is universal)
+      - name: Download Mend CLI
+        run: |
+          curl -L -o mend https://downloads.mend.io/cli/linux_amd64/mend
+          chmod +x mend
+      
+      # --- ÉTAPE 2: SCANS MEND ET GÉNÉRATION DU RAPPORT ---
+
+      # Step 5: Runs the scans and generates the report
+      - name: Run Mend Scans and Generate Report
+        env:
+          # Securely map GitHub secrets to environment variables
+          MEND_USER_KEY: ${{ secrets.MEND_USER_KEY }}
+          MEND_EMAIL: emmanuel.evenzur@mend.io # <-- TODO: UPDATE YOUR EMAIL HERE
+          MEND_URL: https://saas-eu.mend.io
+        run: |
+          # Define the scope for Mend
+          MEND_SCOPE="product=My_JS_Applications -project=MyWebApp_Main" # <-- TODO: UPDATE YOUR SCOPE HERE
+
+          echo "--- Running Mend SCA and SAST scans ---"
+          # CORRECTION: The '--reachability' flag has been REMOVED as it's not for JavaScript
+          ./mend deps --scope "$MEND_SCOPE"
+          ./mend code --scope "$MEND_SCOPE"
+
+          echo "--- Waiting 30 seconds for server processing ---"
+          sleep 30
+          
+          echo "--- Generating JSON report with --export-results ---"
+          ./mend deps --scope "$MEND_SCOPE" --export-results sca-report.json
+
+      # --- ÉTAPE 3: ARCHIVAGE DU RAPPORT ---
+      
+      # Step 6: Uploads the generated report as a build artifact
+      - name: Upload SCA Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: sca-scan-report-js
+          path: sca-report.json
