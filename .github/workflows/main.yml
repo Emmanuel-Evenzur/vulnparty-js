@@ -23,7 +23,7 @@ jobs:
 
       # Step 2: Sets up a Node.js environment (replaces setup-java)
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '18' # You can change this to your project's Node.js version
           cache: 'npm' # Optional: Caches dependencies to speed up subsequent builds
