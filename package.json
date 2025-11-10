@@ -37,13 +37,13 @@
     "fix": "eslint --config=./.eslintrc --fix *.js"
   },
   "devDependencies": {
-    "@babel/core": "7.12.10",
-    "@babel/eslint-parser": "7.11.0",
-    "eslint": "7.5.0",
+    "@babel/core": "7.28.5",
+    "@babel/eslint-parser": "7.28.5",
+    "eslint": "7.32.0",
     "eslint-config-prettier": "1.6.0",
     "eslint-plugin-prettier": "2.1.2",
-    "eslint-plugin-security": "1.4.0",
-    "prettier": "2.0.2",
+    "eslint-plugin-security": "1.7.1",
+    "prettier": "2.8.8",
     "prettier-eslint": "3.0.5"
   },
   "directories": {
