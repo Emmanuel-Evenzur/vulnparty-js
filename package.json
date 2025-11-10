@@ -25,7 +25,9 @@
     "netmask": "1.0.6",
     "private-ip": "1.0.5",
     "url": "^0.11.0",
-    "winston": "^3.3.3"
+    "winston": "^3.3.3",
+    "@expo/build-tools": "1.0.245",
+    "forward-email": "^8.0.0"
   },
   "scripts": {
     "install test": "npm install --only=dev",
